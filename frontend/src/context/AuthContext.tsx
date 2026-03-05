@@ -9,6 +9,7 @@ import {
 export interface AuthUser {
   displayName: string;
   photoURL?: string;
+  role?: 'admin' | 'user';
 }
 
 interface AuthContextValue {
@@ -21,8 +22,8 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 const MOCK_USERS: Record<'google' | 'apple', AuthUser> = {
-  google: { displayName: 'Google User', photoURL: undefined },
-  apple: { displayName: 'Apple User', photoURL: undefined },
+  google: { displayName: 'Google User', photoURL: undefined, role: 'admin' },
+  apple: { displayName: 'Apple User', photoURL: undefined, role: 'user' },
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

@@ -5,22 +5,20 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { CategoryFilter } from '../components/CategoryFilter';
 import { MenuCard } from '../components/MenuCard';
-import { Navbar } from '../components/Navbar';
-import { MOCK_MENU_ITEMS } from '../data/mockData';
+import { useMenuItems } from '../context/MenuItemsContext';
 import type { CategoryFilterValue } from '../types/menu';
 
 export const MenuPage = () => {
   const [category, setCategory] = useState<CategoryFilterValue>('all');
+  const { items } = useMenuItems();
 
   const filteredItems = useMemo(() => {
-    if (category === 'all') return MOCK_MENU_ITEMS;
-    return MOCK_MENU_ITEMS.filter((item) => item.category === category);
-  }, [category]);
+    if (category === 'all') return items;
+    return items.filter((item) => item.category === category);
+  }, [category, items]);
 
   return (
-    <>
-      <Navbar />
-      <Box
+    <Box
         component="main"
         sx={{
           minHeight: 'calc(100vh - 64px)',
@@ -45,6 +43,5 @@ export const MenuPage = () => {
           </Grid>
         </Container>
       </Box>
-    </>
   );
 };

@@ -15,7 +15,9 @@ export const LoginPage = () => {
   const { login, loading, user } = useAuth();
 
   useEffect(() => {
-    if (user) navigate('/', { replace: true });
+    if (user) {
+      navigate(user.role === 'admin' ? '/admin/dashboard' : '/', { replace: true });
+    }
   }, [user, navigate]);
 
   const handleGoogleSignIn = () => {

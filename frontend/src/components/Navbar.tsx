@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -12,7 +12,10 @@ import { useAuth } from '../context/AuthContext';
 
 export const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
+  const isAdminPath = location.pathname.startsWith('/admin');
+  const isAdmin = user?.role === 'admin';
 
   const handleLogout = () => {
     logout();
@@ -41,6 +44,22 @@ export const Navbar = () => {
           <Typography variant="h6" component="span" fontWeight={700} letterSpacing="-0.02em">
             AI Menu
           </Typography>
+          <Button
+            color="inherit"
+            onClick={() => navigate('/')}
+            sx={{ color: isAdminPath ? 'text.secondary' : 'text.primary', fontWeight: isAdminPath ? 500 : 600 }}
+          >
+            Menu
+          </Button>
+          {isAdmin && (
+            <Button
+              color="inherit"
+              onClick={() => navigate('/admin/products')}
+              sx={{ color: 'text.secondary', fontWeight: 500 }}
+            >
+              Admin
+            </Button>
+          )}
         </Box>
         <Box display="flex" alignItems="center" gap={1}>
           {user?.photoURL ? (
