@@ -15,34 +15,47 @@ export interface AuthUser {
 interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
-  login: (provider: 'google' | 'apple') => void;
+  login: (provider: 'google' | 'apple', asAdmin?: boolean) => void;
+  loginWithEmailPassword: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const MOCK_USERS: Record<'google' | 'apple', AuthUser> = {
-  google: { displayName: 'Google User', photoURL: undefined, role: 'admin' },
-  apple: { displayName: 'Apple User', photoURL: undefined, role: 'user' },
+const MOCK_USERS: Record<'google' | 'apple', Omit<AuthUser, 'role'>> = {
+  google: { displayName: 'Google User', photoURL: undefined },
+  apple: { displayName: 'Apple User', photoURL: undefined },
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const login = useCallback((provider: 'google' | 'apple') => {
+  const login = useCallback((provider: 'google' | 'apple', asAdmin = false) => {
     setLoading(true);
     setTimeout(() => {
-      setUser(MOCK_USERS[provider]);
+      const base = MOCK_USERS[provider];
+      setUser({ ...base, role: asAdmin ? 'admin' : 'user' });
       setLoading(false);
     }, 300);
+  }, []);
+
+  const loginWithEmailPassword = useCallback((email: string, _password: string) => {
+    setLoading(true);
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        setUser({ displayName: email || 'Admin User', role: 'admin' });
+        setLoading(false);
+        resolve();
+      }, 300);
+    });
   }, []);
 
   const logout = useCallback(() => {
     setUser(null);
   }, []);
 
-  const value: AuthContextValue = { user, loading, login, logout };
+  const value: AuthContextValue = { user, loading, login, loginWithEmailPassword, logout };
 
   return (
     <AuthContext.Provider value={value}>

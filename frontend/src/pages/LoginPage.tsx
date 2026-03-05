@@ -16,18 +16,16 @@ export const LoginPage = () => {
 
   useEffect(() => {
     if (user) {
-      navigate(user.role === 'admin' ? '/admin/dashboard' : '/', { replace: true });
+      navigate(user.role === 'admin' ? '/admin/dashboard' : '/menu', { replace: true });
     }
   }, [user, navigate]);
 
   const handleGoogleSignIn = () => {
-    login('google');
-    navigate('/', { replace: true });
+    login('google', false);
   };
 
   const handleAppleSignIn = () => {
-    login('apple');
-    navigate('/', { replace: true });
+    login('apple', false);
   };
 
   return (

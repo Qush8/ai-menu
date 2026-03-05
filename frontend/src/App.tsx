@@ -1,14 +1,17 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CategoriesProvider } from './context/CategoriesContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminGuard } from './components/AdminGuard';
 import { MenuItemsProvider } from './context/MenuItemsContext';
 import { UserLayout } from './layouts/UserLayout';
 import { AdminLayout } from './layouts/AdminLayout';
 import { LoginPage } from './pages/LoginPage';
 import { MenuPage } from './pages/MenuPage';
+import { AdminAuthPage } from './pages/admin/AdminAuthPage';
+import { AdminRegisterPage } from './pages/admin/AdminRegisterPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminCategoriesPage } from './pages/admin/AdminCategoriesPage';
@@ -90,19 +93,18 @@ const App = () => (
               <Route index element={<MenuPage />} />
               <Route path="menu" element={<MenuPage />} />
             </Route>
-            <Route
-              path="admin"
-              element={
-                <ProtectedRoute requireAdmin>
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/admin/dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboardPage />} />
-              <Route path="products" element={<AdminProductsPage />} />
-              <Route path="categories" element={<AdminCategoriesPage />} />
-              <Route path="orders" element={<AdminOrdersPage />} />
+            <Route path="admin" element={<Outlet />}>
+              <Route path="auth" element={<AdminAuthPage />} />
+              <Route path="register" element={<AdminRegisterPage />} />
+              <Route element={<AdminGuard />}>
+                <Route element={<AdminLayout />}>
+                  <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                  <Route path="dashboard" element={<AdminDashboardPage />} />
+                  <Route path="products" element={<AdminProductsPage />} />
+                  <Route path="categories" element={<AdminCategoriesPage />} />
+                  <Route path="orders" element={<AdminOrdersPage />} />
+                </Route>
+              </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
