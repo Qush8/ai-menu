@@ -1,4 +1,7 @@
-export type Category = 'pizza' | 'drinks' | 'desserts';
+export interface CategoryRecord {
+  id: string;
+  name: string;
+}
 
 export interface MenuItem {
   id: string;
@@ -6,7 +9,7 @@ export interface MenuItem {
   description: string;
   price: number;
   image: string;
-  category: Category;
+  categoryId: string;
 }
 
-export type CategoryFilterValue = Category | 'all';
+export type CategoryFilterValue = string | 'all';

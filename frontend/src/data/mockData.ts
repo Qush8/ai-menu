@@ -7,7 +7,7 @@ export const MOCK_MENU_ITEMS: MenuItem[] = [
     description: 'Classic tomato sauce, mozzarella, fresh basil',
     price: 22,
     image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=300&fit=crop',
-    category: 'pizza',
+    categoryId: 'pizza',
   },
   {
     id: '2',
@@ -15,7 +15,7 @@ export const MOCK_MENU_ITEMS: MenuItem[] = [
     description: 'Spicy pepperoni, tomato sauce, mozzarella',
     price: 25,
     image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&h=300&fit=crop',
-    category: 'pizza',
+    categoryId: 'pizza',
   },
   {
     id: '3',
@@ -23,7 +23,7 @@ export const MOCK_MENU_ITEMS: MenuItem[] = [
     description: 'Mozzarella, gorgonzola, parmesan, ricotta',
     price: 28,
     image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop',
-    category: 'pizza',
+    categoryId: 'pizza',
   },
   {
     id: '4',
@@ -31,7 +31,7 @@ export const MOCK_MENU_ITEMS: MenuItem[] = [
     description: 'House-made lemonade with mint',
     price: 8,
     image: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&h=300&fit=crop',
-    category: 'drinks',
+    categoryId: 'drinks',
   },
   {
     id: '5',
@@ -39,7 +39,7 @@ export const MOCK_MENU_ITEMS: MenuItem[] = [
     description: 'Cold brew with milk and optional syrup',
     price: 12,
     image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=300&fit=crop',
-    category: 'drinks',
+    categoryId: 'drinks',
   },
   {
     id: '6',
@@ -47,7 +47,7 @@ export const MOCK_MENU_ITEMS: MenuItem[] = [
     description: 'Espresso-soaked ladyfingers, mascarpone, cocoa',
     price: 18,
     image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&h=300&fit=crop',
-    category: 'desserts',
+    categoryId: 'desserts',
   },
   {
     id: '7',
@@ -55,7 +55,7 @@ export const MOCK_MENU_ITEMS: MenuItem[] = [
     description: 'Warm brownie with vanilla ice cream',
     price: 14,
     image: 'https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=400&h=300&fit=crop',
-    category: 'desserts',
+    categoryId: 'desserts',
   },
   {
     id: '8',
@@ -63,6 +63,6 @@ export const MOCK_MENU_ITEMS: MenuItem[] = [
     description: 'Creamy New York style with berry compote',
     price: 16,
     image: 'https://images.unsplash.com/photo-1533134242443-d4ea6f6b0d8c?w=400&h=300&fit=crop',
-    category: 'desserts',
+    categoryId: 'desserts',
   },
 ];

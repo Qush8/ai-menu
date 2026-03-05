@@ -2,6 +2,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { CategoriesProvider } from './context/CategoriesContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { MenuItemsProvider } from './context/MenuItemsContext';
 import { UserLayout } from './layouts/UserLayout';
@@ -74,7 +75,8 @@ const App = () => (
     <CssBaseline />
     <BrowserRouter>
       <AuthProvider>
-        <MenuItemsProvider>
+        <CategoriesProvider>
+          <MenuItemsProvider>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route
@@ -105,6 +107,7 @@ const App = () => (
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </MenuItemsProvider>
+        </CategoriesProvider>
       </AuthProvider>
     </BrowserRouter>
   </ThemeProvider>

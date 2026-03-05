@@ -11,7 +11,6 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import type { MenuItem } from '../../types/menu';
 import {
   Dialog,
   DialogActions,
@@ -20,6 +19,8 @@ import {
   DialogTitle,
   Button,
 } from '@mui/material';
+import { useCategories } from '../../context/CategoriesContext';
+import type { MenuItem } from '../../types/menu';
 
 interface ProductTableProps {
   items: MenuItem[];
@@ -33,7 +34,11 @@ const truncate = (s: string, max: number) =>
   s.length <= max ? s : `${s.slice(0, max)}…`;
 
 export const ProductTable = ({ items, onEdit, onDelete }: ProductTableProps) => {
+  const { categories } = useCategories();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const getCategoryName = (categoryId: string) =>
+    categories.find((c) => c.id === categoryId)?.name ?? categoryId;
 
   const handleDeleteClick = (id: string) => setDeleteId(id);
   const handleDeleteClose = () => setDeleteId(null);
@@ -92,7 +97,7 @@ export const ProductTable = ({ items, onEdit, onDelete }: ProductTableProps) => 
                     {truncate(item.description, TRUNCATE_LEN)}
                   </TableCell>
                   <TableCell align="right">{item.price} GEL</TableCell>
-                  <TableCell sx={{ textTransform: 'capitalize' }}>{item.category}</TableCell>
+                  <TableCell sx={{ textTransform: 'capitalize' }}>{getCategoryName(item.categoryId)}</TableCell>
                   <TableCell align="right">
                     <IconButton
                       onClick={() => onEdit(item)}

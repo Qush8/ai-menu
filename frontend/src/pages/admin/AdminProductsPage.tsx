@@ -44,7 +44,7 @@ export const AdminProductsPage = () => {
         description: item.description,
         price: item.price,
         image: item.image,
-        category: item.category,
+        categoryId: item.categoryId,
       });
     } else {
       updateItem(item.id, {
@@ -52,7 +52,7 @@ export const AdminProductsPage = () => {
         description: item.description,
         price: item.price,
         image: item.image,
-        category: item.category,
+        categoryId: item.categoryId,
       });
     }
     handleDialogClose();

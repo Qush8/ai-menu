@@ -10,10 +10,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import type { Category } from '../../types/menu';
+import { useCategories } from '../../context/CategoriesContext';
 import type { MenuItem as MenuItemType } from '../../types/menu';
-
-const CATEGORIES: Category[] = ['pizza', 'drinks', 'desserts'];
 
 interface ProductFormDialogProps {
   open: boolean;
@@ -28,7 +26,7 @@ const emptyForm = {
   description: '',
   price: '',
   image: '',
-  category: 'pizza' as Category,
+  categoryId: '',
 };
 
 export const ProductFormDialog = ({
@@ -38,12 +36,15 @@ export const ProductFormDialog = ({
   initialItem,
   onSubmit,
 }: ProductFormDialogProps) => {
+  const { categories } = useCategories();
   const [name, setName] = useState(emptyForm.name);
   const [description, setDescription] = useState(emptyForm.description);
   const [price, setPrice] = useState(emptyForm.price);
   const [image, setImage] = useState(emptyForm.image);
-  const [category, setCategory] = useState<Category>(emptyForm.category);
-  const [errors, setErrors] = useState<{ name?: string; price?: string }>({});
+  const [categoryId, setCategoryId] = useState(emptyForm.categoryId);
+  const [errors, setErrors] = useState<{ name?: string; price?: string; category?: string }>({});
+
+  const defaultCategoryId = categories.length > 0 ? categories[0].id : '';
 
   useEffect(() => {
     if (open) {
@@ -52,24 +53,27 @@ export const ProductFormDialog = ({
         setDescription(initialItem.description);
         setPrice(String(initialItem.price));
         setImage(initialItem.image);
-        setCategory(initialItem.category);
+        setCategoryId(initialItem.categoryId);
       } else {
         setName(emptyForm.name);
         setDescription(emptyForm.description);
         setPrice(emptyForm.price);
         setImage(emptyForm.image);
-        setCategory(emptyForm.category);
+        setCategoryId(defaultCategoryId);
       }
       setErrors({});
     }
-  }, [open, mode, initialItem]);
+  }, [open, mode, initialItem, defaultCategoryId]);
 
   const validate = (): boolean => {
-    const next: { name?: string; price?: string } = {};
+    const next: { name?: string; price?: string; category?: string } = {};
     if (!name.trim()) next.name = 'Name is required';
     const priceNum = Number(price);
     if (price === '' || Number.isNaN(priceNum) || priceNum <= 0) {
       next.price = 'Price must be a number greater than 0';
+    }
+    if (categories.length > 0 && !categoryId.trim()) {
+      next.category = 'Category is required';
     }
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -78,6 +82,7 @@ export const ProductFormDialog = ({
   const handleSubmit = () => {
     if (!validate()) return;
     const priceNum = Number(price);
+    const resolvedCategoryId = categoryId.trim() || defaultCategoryId;
     if (mode === 'edit' && initialItem) {
       onSubmit({
         ...initialItem,
@@ -85,7 +90,7 @@ export const ProductFormDialog = ({
         description: description.trim(),
         price: priceNum,
         image: image.trim(),
-        category,
+        categoryId: resolvedCategoryId,
       });
     } else {
       onSubmit({
@@ -94,7 +99,7 @@ export const ProductFormDialog = ({
         description: description.trim(),
         price: priceNum,
         image: image.trim(),
-        category,
+        categoryId: resolvedCategoryId,
       });
     }
     onClose();
@@ -140,26 +145,36 @@ export const ProductFormDialog = ({
             onChange={(e) => setImage(e.target.value)}
             fullWidth
           />
-          <FormControl fullWidth>
+          <FormControl fullWidth error={Boolean(errors.category)}>
             <InputLabel id="category-label">Category</InputLabel>
             <Select
               labelId="category-label"
-              value={category}
+              value={categoryId}
               label="Category"
-              onChange={(e) => setCategory(e.target.value as Category)}
+              onChange={(e) => setCategoryId(e.target.value)}
             >
-              {CATEGORIES.map((cat) => (
-                <MenuItem key={cat} value={cat}>
-                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.id}>
+                  {cat.name}
                 </MenuItem>
               ))}
             </Select>
+            {errors.category && (
+              <Box component="span" sx={{ fontSize: '0.75rem', color: 'error.main', mt: 0.5, display: 'block' }}>
+                {errors.category}
+              </Box>
+            )}
           </FormControl>
+          {categories.length === 0 && (
+            <Box sx={{ color: 'text.secondary', typography: 'body2' }}>
+              No categories yet. Add categories in Admin → Categories first.
+            </Box>
+          )}
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleSubmit}>
+        <Button variant="contained" onClick={handleSubmit} disabled={categories.length === 0}>
           {mode === 'add' ? 'Add' : 'Save'}
         </Button>
       </DialogActions>

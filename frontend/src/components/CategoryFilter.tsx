@@ -1,16 +1,8 @@
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
+import { useCategories } from '../context/CategoriesContext';
 import type { CategoryFilterValue } from '../types/menu';
-
-const CATEGORY_LABELS: Record<CategoryFilterValue, string> = {
-  all: 'All',
-  pizza: 'Pizza',
-  drinks: 'Drinks',
-  desserts: 'Desserts',
-};
-
-const TAB_ORDER: CategoryFilterValue[] = ['all', 'pizza', 'drinks', 'desserts'];
 
 interface CategoryFilterProps {
   value: CategoryFilterValue;
@@ -18,11 +10,13 @@ interface CategoryFilterProps {
 }
 
 export const CategoryFilter = ({ value, onChange }: CategoryFilterProps) => {
-  const index = TAB_ORDER.indexOf(value);
+  const { categories } = useCategories();
+  const tabOrder: CategoryFilterValue[] = ['all', ...categories.map((c) => c.id)];
+  const index = tabOrder.indexOf(value);
   const tabValue = index >= 0 ? index : 0;
 
   const handleChange = (_: React.SyntheticEvent, newIndex: number) => {
-    onChange(TAB_ORDER[newIndex] ?? 'all');
+    onChange(tabOrder[newIndex] ?? 'all');
   };
 
   return (
@@ -43,8 +37,9 @@ export const CategoryFilter = ({ value, onChange }: CategoryFilterProps) => {
           '& .MuiTabs-flexContainer': { gap: 0.5 },
         }}
       >
-        {TAB_ORDER.map((cat) => (
-          <Tab key={cat} label={CATEGORY_LABELS[cat]} id={`category-tab-${cat}`} />
+        <Tab key="all" label="All" id="category-tab-all" />
+        {categories.map((cat) => (
+          <Tab key={cat.id} label={cat.name} id={`category-tab-${cat.id}`} />
         ))}
       </Tabs>
     </Box>

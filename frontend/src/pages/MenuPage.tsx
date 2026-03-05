@@ -14,7 +14,7 @@ export const MenuPage = () => {
 
   const filteredItems = useMemo(() => {
     if (category === 'all') return items;
-    return items.filter((item) => item.category === category);
+    return items.filter((item) => item.categoryId === category);
   }, [category, items]);
 
   return (
