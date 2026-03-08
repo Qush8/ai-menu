@@ -1,10 +1,18 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { Role } from '@prisma/client';
 
 const SALT_ROUNDS = 10;
+
+const registerSchema = z.object({
+  companyName: z.string().min(1, 'Company name is required'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  phoneNumber: z.string().min(1, 'Phone number is required'),
+});
 
 interface RegisterBody {
   companyName?: string;
@@ -20,14 +28,17 @@ interface LoginBody {
 }
 
 export const register = async (req: Request<object, object, RegisterBody>, res: Response): Promise<void> => {
-  const { companyName, email, password, confirmPassword, phoneNumber } = req.body;
+  const validation = registerSchema.safeParse(req.body);
 
-  if (!companyName?.trim() || !email?.trim() || !password || !confirmPassword || !phoneNumber?.trim()) {
-    res.status(400).json({ error: 'All fields are required' });
+  if (!validation.success) {
+    res.status(400).json({ error: validation.error.issues[0].message });
     return;
   }
 
-  if (password !== confirmPassword) {
+  const { companyName, email, password, phoneNumber } = validation.data;
+
+  // Check if passwords match (if confirmPassword is sent, though not in schema)
+  if (req.body.confirmPassword && password !== req.body.confirmPassword) {
     res.status(400).json({ error: 'Passwords do not match' });
     return;
   }
@@ -39,40 +50,35 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
   }
 
   const hashed = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await prisma.user.create({
-    data: {
-      companyName: companyName.trim(),
-      email: email.trim().toLowerCase(),
-      password: hashed,
-      phoneNumber: phoneNumber.trim(),
-      role: 'ADMIN' as Role,
-    } as any,
-  }) as any;
+  try {
+    const user = await prisma.user.create({
+      data: {
+        companyName: companyName.trim(),
+        email: email.trim().toLowerCase(),
+        password: hashed,
+        phoneNumber: phoneNumber.trim(),
+        role: 'ADMIN' as Role,
+      } as any,
+    }) as any;
 
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    res.status(500).json({ error: 'Server misconfiguration' });
-    return;
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      res.status(500).json({ error: 'Server misconfiguration' });
+      return;
+    }
+
+    // We don't necessarily need to return a token on register if we want them to login, 
+    // but the previous implementation did, so we keep it or follow docs.
+    // Docs say: 201 Created with a message and the user ID (excluding password).
+    
+    res.status(201).json({
+      message: 'Registration successful',
+      userId: user.id
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-
-  const token = jwt.sign(
-    { userId: user.id, role: user.role },
-    secret,
-    { expiresIn: '7d' }
-  );
-
-  res.status(201).json({
-    message: 'Registration successful',
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-      companyName: user.companyName,
-      phoneNumber: user.phoneNumber,
-      role: user.role,
-      createdAt: user.createdAt,
-    },
-  });
 };
 
 export const login = async (req: Request<object, object, LoginBody>, res: Response): Promise<void> => {
